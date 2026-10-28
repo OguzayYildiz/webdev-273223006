@@ -37,10 +37,26 @@ node mcp-server/check.mjs -- npm run --silent mcp
 It prints one line per check. Fix the failures yourself: the agent may explain a message or review your handler, but it must not write the protocol code for you.
 
 ## How to start it
-<!-- The exact command, so the lecturer can run your server too. -->
+
+From the project root: `npm run --silent mcp`
 
 ## Session transcript
-<!-- Paste one full session: initialize, the reply, tools/list, one good tools/call, one that fails. -->
+
+Responses below are actual stdout; diagnostics go to stderr.
+
+```text
+client> {"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {"protocolVersion": "2024-11-05", "capabilities": {}, "clientInfo": {"name": "manual-check", "version": "1.0"}}}
+server> {"jsonrpc":"2.0","id":1,"result":{"protocolVersion":"2024-11-05","capabilities":{"tools":{}},"serverInfo":{"name":"course-lectures","version":"0.1.0"}}}
+client> {"jsonrpc": "2.0", "method": "notifications/initialized"}
+(notification: no response)
+client> {"jsonrpc": "2.0", "id": 2, "method": "tools/list"}
+server> {"jsonrpc":"2.0","id":2,"result":{"tools":[{"name":"find_lecture","description":"Use when asked what a numbered lecture covers; return its title and topics.","inputSchema":{"type":"object","properties":{"number":{"type":"integer","description":"Lecture number from 1 to 12"}},"required":["number"]}},{"name":"list_lectures","description":"List the available course lectures with their numbers and titles.","inputSchema":{"type":"object","properties":{}}}]}}
+client> {"jsonrpc": "2.0", "id": 3, "method": "tools/call", "params": {"name": "find_lecture", "arguments": {"number": 5}}}
+server> {"jsonrpc":"2.0","id":3,"result":{"content":[{"type":"text","text":"Lecture 5: What the agent built, part 1. Topics: HTTP, REST vs GraphQL, data modeling, ORM, layers"}],"isError":false}}
+client> {"jsonrpc": "2.0", "id": 4, "method": "tools/call", "params": {"name": "find_lecture", "arguments": {"number": 99}}}
+server> {"jsonrpc":"2.0","id":4,"result":{"content":[{"type":"text","text":"There is no lecture 99. The course has lectures 1 to 12."}],"isError":true}}
+```
 
 ## The description experiment
-<!-- Three sentences: what you changed in the description, whether the model chose the tool differently, and why you think so. -->
+
+I changed the description from "Find one lecture by its number and return its title and topics." to "Use when asked what a numbered lecture covers; return its title and topics." For "What does lecture 7 cover?", Gemini chose find_lecture both before and after the change, including after restarting Gemini. An intermediate repeat in the same conversation used ReadFile instead, so context and model variability could affect the choice; this small experiment does not prove a causal effect.

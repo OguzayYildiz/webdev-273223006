@@ -34,7 +34,8 @@
      A description shorter than 20 characters is not a description. -->
 | Tool | What it does | Who may call it |
 | --- | --- | --- |
-|  |  |  |
+| find_lecture | Find a numbered lecture and its topics. | Any local exercise client; no authentication yet. |
+| list_lectures | List available lecture numbers and titles. | Any local exercise client; no authentication yet. |
 
 ## UI
 <!-- Stack, and the three or more screens. The graded checklist lives in docs/UI.md. -->
