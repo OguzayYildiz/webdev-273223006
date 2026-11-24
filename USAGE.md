@@ -9,3 +9,7 @@ One row per agent session. In Gemini CLI, type `/stats` before you quit and copy
 The CLI also reported 75026 cache reads. The estimate treats all reported input tokens at the standard input rate, with no cache discount: 133118 x $0.30 / 1M + 658 x $2.50 / 1M = $0.04159. Rates: [Gemini API pricing](https://ai.google.dev/gemini-api/docs/pricing), checked 2026-10-27. Actual charges depend on account tier and billing; this is not a bill. Gemini reported API-key authentication. Earlier interrupted session statistics were not fully recorded. Codex usage is not included in this Gemini CLI row.
 
 The fresh-session experiment succeeded, but its final token statistics were lost when the Codespace stopped and are not included above.
+
+| 2026-11-24 | Codex API | | | | |
+
+Codex session token counts and list-price cost were unavailable to record. No earlier measurement was reconstructed.
