@@ -90,3 +90,7 @@ development database. The application uses PostgreSQL in development
 Run `npm test` for the HTTP tests and `node checks/ex2.mjs` for the course
 specification check. See [CHECKLIST.md](CHECKLIST.md) for verified and pending
 submission items.
+
+Project MCP clients also set `DATABASE_URL` to the shared PostgreSQL instance and
+`MCP_TOKEN` to the current ordinary session token. Neither value belongs in Git.
+The lecture tools continue to work from an unconfigured local workspace.

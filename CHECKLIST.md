@@ -17,8 +17,8 @@ Oguzay Yildiz · 273223006
 
 ## Exercise 3 · Full feature
 
-- [ ] Verify booking and cancellation, service rules, feature commits and AC traceability.
-- [ ] Verify the model feature and project MCP tools.
+- [x] Booking, cancellation, authorization, duplicate prevention and AC traceability have local test evidence. Feature steps are individually committed. The course check passed 18/18.
+- [x] Model fallback and revalidation passed with fake clients. MCP integration passed with an ordinary session in tests and lecture conformance remained 12/12.
 
 ## Exercise 4 · Deployment
 

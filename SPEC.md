@@ -50,7 +50,11 @@ HTML, CSS and browser JavaScript. Sign-in, lab directory, booking screen, person
 
 ## Architecture
 
-The first slice renders sign-in and the lab list on the server. The feature architecture will be documented in Exercise 3.
+- Browser: `src/views.js` provides the lab shell. `public/booking.js` handles the selected day and current request number, draws the free-slot buttons, and sends `POST /api/bookings` when a student confirms.
+- HTTP: `src/booking-routes.js` authenticates the session, calls `booking.book` and returns 201 or the service's error status.
+- Service and storage: `src/services/booking.js` validates the Sofia time slot, and `src/data/bookings.js` inserts it. The uniqueness constraint in migration 002 ensures that concurrent writes cannot reserve the same workstation and hour.
+- MCP: `mcp-server/project-tools.js` uses the same booking and authentication services. Calls act only as the user whose session token is configured.
+- Boundary decision: The main HTTP dispatch still composes services, renders pages and maps domain errors. API booking handlers live in their own file, while the five shell pages remain in the main dispatch to share cookie and error handling.
 
 ## Acceptance criteria
 
@@ -73,6 +77,14 @@ The first slice renders sign-in and the lab list on the server. The feature arch
 
 | Criterion | Test |
 | --- | --- |
+| AC-1 | `test/bookings.test.js` |
+| AC-2 | `test/bookings.test.js` |
+| AC-3 | `test/booking-service.test.js` and `test/bookings.test.js` |
+| AC-4 | `test/bookings.test.js` |
+| AC-5 | `test/bookings.test.js` |
+| AC-6 | `test/bookings.test.js` |
+| AC-7 | `test/suggestion.test.js` and `test/bookings.test.js` |
+| AC-8 | `test/mcp.test.js` and `test/bookings.test.js` |
 | AC-9 | `test/slice-one.test.js` |
 | AC-10 | `test/slice-one.test.js` |
 | AC-11 | `test/slice-one.test.js` |
