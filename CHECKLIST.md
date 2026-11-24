@@ -30,4 +30,7 @@ Oguzay Yildiz · 273223006
 
 ## Exercise 5 · Peer review
 
-- [ ] Complete the assigned peer exchange, fixes, CI verification and defence notes.
+- [x] Pinned the assigned peer's commit and drafted a source-evidenced review in REVIEW.md.
+- [ ] Complete the independent review pass, student triage and reciprocal review.
+- [ ] Record any peer-requested fixes with failing-test and fix commits, then verify CI and redeployment.
+- [ ] Write student-authored DEFENSE.md and complete the course assistant walkthrough.

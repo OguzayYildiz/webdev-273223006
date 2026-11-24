@@ -50,3 +50,10 @@ One entry per agent session, newest at the bottom. Be honest: what went wrong is
 - Checkpoints: Google verified-email linking passed against a fake provider and the original account ID. A local reservation page displayed loading, empty, error and success. Local 380, 768 and 1280 px runs showed no horizontal overflow on that screen.
 - Went wrong: The first coverage gate exposed missing branches. Additional tests covered the missing decisions. The 33-test suite passed and the local gate reported 100% service lines, branches and functions, plus 95.03% backend lines. The browser inspection could not return Network timings. The student deferred Render and Neon configuration, so public URL, live timings, real OAuth and rollback remain pending.
 - Deployment claims: No public deployment or live test is claimed.
+
+## 2026-11-24 · Exercise 5 initial peer source review
+- Goal: Review the assigned peer's published Lab Booking snapshot and preserve source evidence.
+- Delegated: Codex inspected the pinned peer source and drafted REVIEW.md. The peer's live app was not contacted. The cloned peer repository was unchanged.
+- Checkpoints: Recorded six rows with links to the reviewed commit. The peer and project production lockfile audits both reported zero advisories.
+- Pending: Independent second agent pass, the student's manual triage, Ahmet's reciprocal review, and any test-first fixes and deployment verification it requires.
+- Changed by hand: The student supplied the assigned peer's repository link. The defence note remains the student's own work.
