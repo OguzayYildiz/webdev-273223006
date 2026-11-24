@@ -13,6 +13,9 @@ async function seed() {
       await tx.query('INSERT INTO users (email, password_hash) VALUES ($1, $2) ON CONFLICT (email) DO NOTHING',
         ['student@example.test', passwordHash]);
       await tx.query("INSERT INTO labs (name, location) VALUES ('Lab A-204', 'Building A · Level 2'), ('Lab B-108', 'Building B · Level 1') ON CONFLICT (name) DO NOTHING");
+      await tx.query(`INSERT INTO workstations (lab_id, label)
+        SELECT id, name || ' / PC ' || station FROM labs CROSS JOIN generate_series(1, 3) AS station
+        WHERE name IN ('Lab A-204', 'Lab B-108') ON CONFLICT (lab_id, label) DO NOTHING`);
     });
   } finally {
     await db.close();

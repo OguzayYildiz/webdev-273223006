@@ -1,6 +1,8 @@
 const readline = require('readline');
 const fs = require('fs');
 const path = require('path');
+const { tools: projectTools, createProjectTools } = require('./project-tools');
+const project = createProjectTools();
 
 const input = readline.createInterface({ input: process.stdin });
 const tools = [
@@ -42,8 +44,7 @@ function sendError(id, code, message) {
   console.log(JSON.stringify({ jsonrpc: '2.0', id: id, error: { code: code, message: message } }));
 }
 
-input.on('line', (line) => {
-  console.error('got: ' + line);
+input.on('line', async (line) => {
   let message;
   try {
     message = JSON.parse(line);
@@ -51,6 +52,12 @@ input.on('line', (line) => {
     sendError(null, -32700, 'Invalid JSON');
     return;
   }
+
+  if (!message || typeof message !== 'object' || Array.isArray(message)) {
+    sendError(null, -32600, 'Invalid request');
+    return;
+  }
+  console.error(typeof message.method === 'string' ? 'MCP request received' : 'Invalid MCP method');
 
   // Notifications have no id, so they do not get a reply.
   if (message.id === undefined) return;
@@ -62,7 +69,7 @@ input.on('line', (line) => {
       serverInfo: { name: 'course-lectures', version: '0.1.0' }
     });
   } else if (message.method === 'tools/list') {
-    sendResult(message.id, { tools: tools });
+    sendResult(message.id, { tools: [...tools, ...projectTools] });
   } else if (message.method === 'tools/call') {
     const params = message.params || {};
     const args = params.arguments || {};
@@ -79,6 +86,8 @@ input.on('line', (line) => {
       sendResult(message.id, { content: [{ type: 'text', text: text }], isError: isError });
     } else if (params.name === 'list_lectures') {
       sendResult(message.id, { content: [{ type: 'text', text: listLectures() }], isError: false });
+    } else if (projectTools.some((tool) => tool.name === params.name)) {
+      sendResult(message.id, await project.call(params.name, args));
     } else {
       sendError(message.id, -32602, 'Unknown tool: ' + params.name);
     }
@@ -86,3 +95,5 @@ input.on('line', (line) => {
     sendError(message.id, -32601, 'Unknown method: ' + message.method);
   }
 });
+
+input.on('close', () => project.close().catch(() => console.error('Could not close project storage.')));

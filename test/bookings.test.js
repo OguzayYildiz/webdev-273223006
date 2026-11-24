@@ -123,3 +123,41 @@ test('booking screens serve meaningful headings and the staff page is protected'
   const script = await request('/assets/booking.js');
   assert.match(script.headers.get('content-type'), /text\/javascript/);
 });
+
+test('AC-8 MCP tools use an ordinary session and the same booking rules as HTTP', async () => {
+  const { createProjectTools } = require('../mcp-server/project-tools');
+  const { identity } = require('../src/data/identity');
+  const { authService } = require('../src/services/auth');
+  const { bookingData } = require('../src/data/bookings');
+  const { bookingService } = require('../src/services/booking');
+  const services = { auth: authService(identity(db)), booking: bookingService(bookingData(db), { now }) };
+  const load = async () => services;
+  const call = createProjectTools(load, { token: first.slice(4) }).call;
+  const denied = createProjectTools(load, { token: '' }).call;
+  const expired = createProjectTools(load, { token: '0'.repeat(64) }).call;
+  assert.equal((await denied('my_bookings', {})).isError, true);
+  assert.equal((await expired('my_bookings', {})).isError, true);
+  const params = { labId: 1, date };
+  const before = JSON.parse((await call('list_free_slots', params)).content[0].text);
+  assert.ok(before.slots.some((slot) => slot.workstationId === 1 && slot.hour === 15));
+  const result = await call('book_slot', { workstationId: 1, date, hour: 15 });
+  assert.equal(result.isError, false);
+  const created = JSON.parse(result.content[0].text);
+  const after = JSON.parse((await call('list_free_slots', params)).content[0].text);
+  assert.ok(!after.slots.some((slot) => slot.workstationId === 1 && slot.hour === 15));
+  assert.equal((await book(second, 15)).status, 409);
+  assert.equal((await call('book_slot', { workstationId: 1, date, hour: 15 })).isError, true);
+  const mine = JSON.parse((await call('my_bookings', {})).content[0].text);
+  assert.ok(mine.some((row) => row.id === created.id));
+  assert.ok(mine.every((row) => row.userId === created.userId));
+});
+
+test('AC-7 authenticated suggestion endpoint leaves manual booking available with no key', async () => {
+  const response = await request('/api/labs/1/suggestion', {
+    method: 'POST', cookie: first, value: { date, preference: 'Afternoon' }
+  });
+  assert.equal(response.status, 200);
+  const result = await response.json();
+  assert.equal(result.suggestion, null);
+  assert.match(result.message, /select a slot yourself/i);
+});
