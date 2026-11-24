@@ -6,7 +6,8 @@
     "test": "node --test",
     "mcp": "node mcp-server/server.js",
     "start": "node src/server.js",
-    "seed": "node src/seed.js"
+    "seed": "node src/seed.js",
+    "migrate": "node src/migrate.js"
   },
   "repository": {
     "type": "git",
