@@ -7,12 +7,14 @@ const { authService } = require('./services/auth');
 const { labService } = require('./services/labs');
 const { HttpError, html, json, redirect, send, cookie, readBody } = require('./http');
 const view = require('./views');
+const { googleSignIn } = require('./services/google');
 const { bookingData } = require('./data/bookings');
 const { bookingService, localTime, ServiceError } = require('./services/booking');
 const { handleBooking } = require('./booking-routes');
 const { geminiClient, suggestionService } = require('./services/suggestion');
 
-function createApp(db, { publicBaseUrl, secure = false, now, modelKey, modelName } = {}) {
+function createApp(db, { publicBaseUrl, secure = false, now, modelKey, modelName, google = {} } = {}) {
+  const provider = googleSignIn({ ...google, baseUrl: publicBaseUrl });
   const auth = authService(identity(db));
   const labs = labService(labData(db));
   const booking = bookingService(bookingData(db), { now });
@@ -20,6 +22,8 @@ function createApp(db, { publicBaseUrl, secure = false, now, modelKey, modelName
   const script = readFileSync(join(__dirname, '../public/booking.js'));
   const css = readFileSync(join(__dirname, '../public/app.css'));
   const session = (token) => `sid=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${token ? 28800 : 0}${secure ? '; Secure' : ''}`;
+
+  const pendingCookie = (value) => `oauth_pending=${value}; Path=/auth/google/callback; HttpOnly; SameSite=Lax; Max-Age=${value ? 300 : 0}${secure ? '; Secure' : ''}`;
 
   return createServer(async (req, res) => {
     res.setHeader('cache-control', 'no-store');
@@ -38,12 +42,42 @@ function createApp(db, { publicBaseUrl, secure = false, now, modelKey, modelName
       if (route === 'GET /assets/booking.js') return send(res, 200, script, 'text/javascript');
       if (route === 'GET /assets/app.css') return send(res, 200, css, 'text/css');
       if (route === 'GET /') return redirect(res, '/labs');
-      if (route === 'GET /login') return html(res, 200, view.login());
+      if (route === 'GET /health') {
+        try {
+          await db.query('SELECT 1');
+          return json(res, 200, { status: 'ok', db: 'ok' });
+        } catch {
+          return json(res, 503, { status: 'unavailable', db: 'unavailable' });
+        }
+      }
+      if (route === 'GET /login') return html(res, 200, view.login('', Boolean(provider)));
+      if (route === 'GET /auth/google') {
+        if (!provider) throw new HttpError(503, 'Google sign-in is unavailable. You can sign in with a password.');
+        const { url: destination, pending } = provider.begin();
+        return redirect(res, destination, { 'set-cookie': pendingCookie(pending) }, 302);
+      }
+      if (route === 'GET /auth/google/callback') {
+        res.setHeader('set-cookie', pendingCookie(''));
+        if (!provider) throw new HttpError(503, 'Google sign-in is unavailable. You can sign in with a password.');
+        try {
+          const profile = await provider.profile({
+            state: url.searchParams.get('state'), code: url.searchParams.get('code'), pending: cookie(req, 'oauth_pending')
+          });
+          const token = await auth.providerLogin(profile);
+          if (!token) throw new HttpError(409, 'This email is linked to a different Google account.');
+          return redirect(res, '/labs', { 'set-cookie': [pendingCookie(''), session(token)] });
+        } catch (error) {
+          if (error instanceof ServiceError || error instanceof HttpError) {
+            return html(res, error.status, view.login(error.message, true));
+          }
+          throw error;
+        }
+      }
       if (route === 'POST /login') {
         const { email, password } = await readBody(req);
         const token = await auth.login(email, password);
         return token ? redirect(res, '/labs', { 'set-cookie': session(token) })
-          : html(res, 401, view.login('The email address or password is incorrect.'));
+          : html(res, 401, view.login('The email address or password is incorrect.', Boolean(provider)));
       }
       const token = cookie(req, 'sid');
       if (route === 'POST /logout') {

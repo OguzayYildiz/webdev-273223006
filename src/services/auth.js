@@ -28,6 +28,10 @@ function authService(data) {
       const valid = timingSafeEqual(actual, Buffer.from(expected, 'hex'));
       return user?.password_hash && valid ? start(user) : null;
     },
+    async providerLogin(profile) {
+      const user = await data.byGoogle(profile);
+      return user ? start(user) : null;
+    },
     async current(token) {
       return token && /^[a-f0-9]{64}$/.test(token) ? data.userForSession(hashToken(token)) : null;
     },

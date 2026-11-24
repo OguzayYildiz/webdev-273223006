@@ -34,7 +34,15 @@ before(async () => {
     ('one@example.test', $1, 'student'), ('two@example.test', $1, 'student'), ('staff@example.test', $1, 'staff')`, [hash]);
   await db.query("INSERT INTO labs (name, location) VALUES ('Lab A', 'Building A'), ('Lab B', 'Building B')");
   await db.query("INSERT INTO workstations (lab_id, label) VALUES (1, 'A-01'), (1, 'A-02')");
-  server = createApp(db, { now }).listen(0, '127.0.0.1');
+  server = createApp(db, {
+    now, publicBaseUrl: 'https://app.example.test', secure: true,
+    google: {
+      clientId: 'test-client', clientSecret: 'test-secret', sessionSecret: 'temporary-test-signing-key',
+      fetcher: async (url) => ({ ok: true, json: async () => url.endsWith('/token')
+        ? { access_token: 'test-access' }
+        : { sub: 'provider-one', email: 'one@example.test', email_verified: true } })
+    }
+  }).listen(0, '127.0.0.1');
   await once(server, 'listening');
   base = 'http://127.0.0.1:' + server.address().port;
   [first, second, staff] = await Promise.all(['one@example.test', 'two@example.test', 'staff@example.test'].map(login));
@@ -160,4 +168,43 @@ test('AC-7 authenticated suggestion endpoint leaves manual booking available wit
   const result = await response.json();
   assert.equal(result.suggestion, null);
   assert.match(result.message, /select a slot yourself/i);
+});
+
+test('a verified provider sign-in keeps the existing account and session rules', async () => {
+  const health = await request('/health');
+  assert.deepEqual(await health.json(), { status: 'ok', db: 'ok' });
+  const page = await request('/login');
+  assert.match(await page.text(), /Sign in with Google/);
+  const start = await request('/auth/google');
+  assert.equal(start.status, 302);
+  const provider = new URL(start.headers.get('location'));
+  assert.equal(provider.hostname, 'accounts.google.com');
+  const state = provider.searchParams.get('state');
+  const pending = start.headers.get('set-cookie').split(';')[0];
+  const failure = await request('/auth/google/callback?code=demo&state=invalid', { cookie: pending });
+  assert.equal(failure.status, 400);
+  const result = await request('/auth/google/callback?code=demo&state=' + encodeURIComponent(state), { cookie: pending });
+  assert.equal(result.status, 303);
+  const session = result.headers.getSetCookie().find((value) => value.startsWith('sid='));
+  assert.match(session, /HttpOnly.*SameSite=Lax.*Secure/);
+  const rows = await db.query("SELECT id, google_subject FROM users WHERE email = 'one@example.test'");
+  assert.deepEqual(rows.rows, [{ id: 1, google_subject: 'provider-one' }]);
+  const signedIn = await request('/labs', { cookie: session.split(';')[0] });
+  assert.equal(signedIn.status, 200);
+  const out = await request('/logout', { cookie: session.split(';')[0], method: 'POST' });
+  assert.equal(out.status, 303);
+  assert.equal((await request('/api/labs', { cookie: session.split(';')[0] })).status, 401);
+});
+
+test('health becomes unavailable when the database is unreachable, without exposing internal errors', async () => {
+  const unavailable = createApp({ query: async () => { throw new Error('test-only internal database error'); } })
+    .listen(0, '127.0.0.1');
+  try {
+    await once(unavailable, 'listening');
+    const response = await fetch('http://127.0.0.1:' + unavailable.address().port + '/health');
+    assert.equal(response.status, 503);
+    assert.deepEqual(await response.json(), { status: 'unavailable', db: 'unavailable' });
+  } finally {
+    await new Promise((resolve) => unavailable.close(resolve));
+  }
 });

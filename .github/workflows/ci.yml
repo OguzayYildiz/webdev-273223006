@@ -50,6 +50,42 @@ jobs:
         if: hashFiles('Dockerfile') != ''
         run: docker build -t ci-check .
 
+      - name: Production container and PostgreSQL persistence
+        if: hashFiles('Dockerfile') != ''
+        run: |
+          docker network create course-smoke
+          docker run -d --name course-db --network course-smoke \
+            -e POSTGRES_PASSWORD=course-local-test postgres:17-alpine
+          for attempt in $(seq 1 30); do
+            if docker exec course-db pg_isready -U postgres; then break; fi
+            sleep 1
+          done
+          docker exec course-db pg_isready -U postgres
+          export DATABASE_URL=postgresql://postgres:course-local-test@course-db:5432/postgres
+          start_app() {
+            docker run -d --name course-app --network course-smoke \
+              -e DATABASE_URL -p 127.0.0.1:3100:3000 ci-check
+            for attempt in $(seq 1 30); do
+              if curl -fsS http://127.0.0.1:3100/health; then return; fi
+              sleep 1
+            done
+            docker logs course-app
+            return 1
+          }
+          start_app
+          docker run --rm --network course-smoke -e DATABASE_URL \
+            -e NEW_USER_PASSWORD=course-local-user-password ci-check \
+            node src/create-user.js staff@example.test staff
+          session=$(curl -fsS -D - -o /dev/null \
+            --data-urlencode email=staff@example.test --data-urlencode password=course-local-user-password \
+            http://127.0.0.1:3100/login | awk 'tolower($1) == "set-cookie:" { split($2, fields, ";"); print fields[1] }')
+          test -n "$session"
+          curl -fsS --cookie "$session" -H 'Content-Type: application/json' \
+            -d '{"name":"Persistence Lab","location":"CI only"}' http://127.0.0.1:3100/api/staff/labs
+          docker rm -f course-app
+          start_app
+          curl -fsS --cookie "$session" http://127.0.0.1:3100/api/labs | grep -F 'Persistence Lab'
+
   # A separate job so its log is readable on its own, and so a coverage failure is
   # unmistakably a coverage failure. From Exercise 4 on.
   #
@@ -143,3 +179,8 @@ jobs:
           node-version: '22.x'
       - name: SPEC.md is still filled in
         run: node checks/ex2.mjs
+
+      - name: Exercise 3 feature check
+        run: |
+          npm ci
+          node checks/ex3.mjs

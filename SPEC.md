@@ -25,7 +25,7 @@ Lab booking.
 
 ## The model feature
 
-- Model: Gemini via a service adapter. It can rank candidate slots described by a student.
+- Model: Gemini 3.5 Flash-Lite via a service adapter, selected for short, structured ranking responses. It can rank candidate slots described by a student.
 - Input: a short scheduling preference and a list of available candidate slots, without account details.
 - Output: the ID of one available candidate, verified before display.
 - When it fails: timeout, unavailable key, rate limit or invalid output leaves manual selection available.
@@ -55,6 +55,16 @@ HTML, CSS and browser JavaScript. Sign-in, lab directory, booking screen, person
 - Service and storage: `src/services/booking.js` validates the Sofia time slot, and `src/data/bookings.js` inserts it. The uniqueness constraint in migration 002 ensures that concurrent writes cannot reserve the same workstation and hour.
 - MCP: `mcp-server/project-tools.js` uses the same booking and authentication services. Calls act only as the user whose session token is configured.
 - Boundary decision: The main HTTP dispatch still composes services, renders pages and maps domain errors. API booking handlers live in their own file, while the five shell pages remain in the main dispatch to share cookie and error handling.
+
+### Screen rendering
+
+| Screen | Rendering | What the user sees while waiting |
+| --- | --- | --- |
+| Sign in | Server-rendered form | The browser navigates to the next page once the session is created. |
+| Lab directory | Server-rendered database list | The browser waits for the HTML response. This keeps the directory useful without client JavaScript. |
+| Reservation | Server-rendered shell, browser-rendered slot grid | The date control stays visible with a loading status. The grid refreshes without replacing the screen. |
+| My bookings | Server-rendered shell, browser-rendered reservations | A loading status precedes the list. Cancel refreshes the list in place. |
+| Staff | Server-rendered form and lab choices, browser-rendered daily reports | The forms stay visible while the report loads or is refreshed. |
 
 ## Acceptance criteria
 

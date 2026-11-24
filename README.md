@@ -94,3 +94,17 @@ submission items.
 Project MCP clients also set `DATABASE_URL` to the shared PostgreSQL instance and
 `MCP_TOKEN` to the current ordinary session token. Neither value belongs in Git.
 The lecture tools continue to work from an unconfigured local workspace.
+
+## Deployment
+
+The Render blueprint in `render.yaml` uses the Dockerfile, `/health` and the
+GitHub Actions gate. Configure a persistent Neon PostgreSQL instance as
+`DATABASE_URL`. Configure the Google web OAuth client using the actual Render
+HTTPS origin and add its `/auth/google/callback` route as an authorized redirect.
+Render supplies the origin and the blueprint generates the OAuth state-signing
+secret. The optional `GEMINI_API_KEY` enables model suggestions.
+
+Use `npm run create-user -- your-email@example.com staff` with
+`NEW_USER_PASSWORD` set securely in the operator shell to provision the first
+staff account. With `DATABASE_URL` present this uses the same deployed database.
+The course Readiness report records which deployment checks have been observed.

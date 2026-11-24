@@ -23,7 +23,10 @@ Oguzay Yildiz · 273223006
 ## Exercise 4 · Deployment
 
 - [ ] Verify a public deployment, provider sign-in and database persistence.
-- [ ] Verify the CI coverage gate, UI checklist and readiness report.
+- [x] Added Docker, deployment configuration, OAuth linking and readiness notes. The 33-test suite passed locally with 100% service lines and branches and 95.03% backend line coverage.
+- [x] Verified the four reservation states and no horizontal overflow on that screen at 380, 768 and 1280 px.
+- [ ] Record the Linux CI result and complete remaining UI evidence across all screens.
+- [ ] Public URL, real OAuth and live rollback evidence are pending. The student deferred Render and Neon setup.
 
 ## Exercise 5 · Peer review
 

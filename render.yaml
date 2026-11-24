@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: campus-workstations-273223006
+    runtime: docker
+    plan: free
+    region: frankfurt
+    healthCheckPath: /health
+    autoDeployTrigger: checksPass
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false

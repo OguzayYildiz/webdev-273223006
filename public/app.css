@@ -59,3 +59,4 @@ nav a { display: inline-flex; align-items: center; min-height: 44px; }
 @media (max-width: 40rem) {
   .top { align-items: flex-start; flex-direction: column; gap: 0; padding-block: var(--space-1); }
 }
+.provider { display: inline-flex; align-items: center; min-height: 44px; }

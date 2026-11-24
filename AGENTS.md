@@ -12,7 +12,7 @@ Campus Workstations lets TU Sofia students book lab workstations and staff manag
 - Run: npm start
 - Test: npm test
 - Migrate: npm run migrate
-- Coverage: 
+- Coverage: npm run coverage
 - MCP server: npm run --silent mcp
 
 ## Conventions

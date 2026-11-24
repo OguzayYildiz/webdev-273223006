@@ -17,14 +17,16 @@ ${user.role === 'staff' ? '<a href="/staff">Staff</a>' : ''}
 ${screen ? '<script src="/assets/booking.js" defer></script>' : ''}</body></html>`;
 }
 
-function login(error = '') {
+function login(error = '', google = false) {
   return page('Sign in', `<section class="narrow"><h1>Sign in</h1>
 <p class="lede">Use your account to view labs and book a workstation.</p>
 <form class="panel stack" method="post" action="/login">
 ${error ? `<p role="alert" class="error">${escapeHtml(error)}</p>` : ''}
 <label for="email">Email address</label><input id="email" name="email" type="email" autocomplete="username" maxlength="254" required>
 <label for="password">Password</label><input id="password" name="password" type="password" autocomplete="current-password" maxlength="256" required>
-<button>Sign in</button></form></section>`);
+<button>Sign in</button>
+${google ? '<a class="provider" href="/auth/google">Sign in with Google</a>' : ''}
+</form></section>`);
 }
 
 function labs(labList, user) {

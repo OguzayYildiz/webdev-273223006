@@ -43,3 +43,10 @@ One entry per agent session, newest at the bottom. Be honest: what went wrong is
 - What the agent did that I did not ask for: The duplicate-request test runs two API calls together to verify the database boundary. Added a separate regression check for already-started Sofia slots. Kept both tests because the schedule rule and concurrency behavior affect confirmed bookings.
 - Changed by hand: Student architecture review and the in-room demonstration remain outstanding.
 - Rule check: Temporarily removed the already-started-slot guard in the local copy. The relevant service test failed, and it passed again after the guard was restored. The course Exercise 3 check passed 18/18 with a Windows npm launcher shim outside the repository.
+
+## 2026-11-24 · Exercise 4 local readiness
+- Goal: Prepare the runtime image, delivery configuration, coverage gates, provider login and the evidence report.
+- Delegated: Codex implemented and tested the application and reviewed the local UI with a browser.
+- Checkpoints: Google verified-email linking passed against a fake provider and the original account ID. A local reservation page displayed loading, empty, error and success. Local 380, 768 and 1280 px runs showed no horizontal overflow on that screen.
+- Went wrong: The first coverage gate exposed missing branches. Additional tests covered the missing decisions. The 33-test suite passed and the local gate reported 100% service lines, branches and functions, plus 95.03% backend lines. The browser inspection could not return Network timings. The student deferred Render and Neon configuration, so public URL, live timings, real OAuth and rollback remain pending.
+- Deployment claims: No public deployment or live test is claimed.

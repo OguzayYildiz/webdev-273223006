@@ -11,7 +11,7 @@ the text is readable, and nothing jumps around while it loads.
 
 ## Layout and typography
 
-- [ ] **One spacing scale and one type scale.** Sizes come from a small set of design tokens, not from numbers typed where they were needed.
+- [x] **One spacing scale and one type scale.** Sizes come from a small set of design tokens, not from numbers typed where they were needed.
   - how I checked:
 - [ ] **Responsive at 380, 768 and 1280 pixels wide.** No horizontal scrollbar, no text running under another element.
   - how I checked:
@@ -35,9 +35,9 @@ A screen that only handles "it worked" is a screen that lies to the user on the 
 
 - [ ] **The main flow works with the keyboard alone.** Sign in, do the core action, sign out, without touching the mouse.
   - how I checked:
-- [ ] **The focused element is visible.** A `:focus-visible` outline that is not switched off.
+- [x] **The focused element is visible.** A `:focus-visible` outline that is not switched off.
   - how I checked:
-- [ ] **Text contrast is at least 4.5:1.** Name the tool you measured with.
+- [x] **Text contrast is at least 4.5:1.** Name the tool you measured with.
   - how I checked:
 - [ ] **Every input has a label** a screen reader reads, not just placeholder text.
   - how I checked:
@@ -57,10 +57,21 @@ A screen that only handles "it worked" is a screen that lies to the user on the 
 
 ## Decisions
 
-- [ ] **Dark mode, or a written decision not to have one.**
+- [x] **Dark mode, or a written decision not to have one.**
   - what I decided and why:
 
 ## Evidence
 
 <!-- Screenshots of at least the four states of one screen, and of the model feature
      thinking and failing. A link to them is enough; they do not have to be in the repo. -->
+
+## Local walkthrough · 2026-11-24
+
+- How I checked the tokens: `public/app.css` defines the palette, type scale, spacing scale and corner radius once.
+- How I checked width on the reservation screen: Chromium viewport overrides 380, 768 and 1280 px gave document widths 365, 753 and 1265 px. Other screens still require a browser pass at those widths.
+- How I checked the reservation states: the initial browser shell displayed Loading. A weekend was empty, an invalid date showed a readable error, and booking then cancelling updated the grid.
+- How I checked focus: Tab moved to the next booking button, and Chromium reported a solid visible outline. Enter reserved and cancelled the local slot and signed out.
+- How I checked text contrast: I read the computed color tokens in Chromium and used a JavaScript WCAG relative-luminance calculation. Ink/paper was 12.87:1, muted/paper 6.96:1, white/accent 7.59:1 and accent/paper 6.83:1.
+- How I checked model fallback: the local browser with no Gemini key displayed the fallback message and retained manual slot controls.
+- Dark mode decision: the first release uses a single light palette so the accessibility checks apply to one tested color set.
+- Live screenshots, Network timings and unverified UI items are tracked in READINESS.md.
