@@ -45,3 +45,17 @@ button.quiet { color: var(--accent); background: var(--white); }
 .error { color: var(--error); }
 .skip { position: absolute; top: var(--space-1); left: var(--space-1); padding: var(--space-1); background: var(--white); transform: translateY(-150%); }
 .skip:focus { transform: none; }
+
+nav { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-1) var(--space-2); }
+nav a { display: inline-flex; align-items: center; min-height: 44px; }
+.date-field { display: grid; gap: var(--space-1); max-width: 13rem; margin-block: var(--space-2); }
+.workstation { margin-block: var(--space-2); }
+.slots { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 8rem), 1fr)); gap: var(--space-1); padding: 0; list-style: none; }
+.slots li { display: grid; place-items: center; padding: var(--space-1); gap: var(--space-1); border: 1px solid var(--edge); border-radius: var(--radius); }
+.slots li span { display: grid; place-items: center; min-height: 44px; color: var(--muted); }
+.room button { margin-top: var(--space-2); }
+.management { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr)); gap: var(--space-2); margin-block: var(--space-3); }
+#status { min-height: 1.6em; }
+@media (max-width: 40rem) {
+  .top { align-items: flex-start; flex-direction: column; gap: 0; padding-block: var(--space-1); }
+}

@@ -110,3 +110,16 @@ test('invalid dates, unknown workstations and cross-site writes are rejected', a
     value: { workstationId: 1, date, hour: 9 }
   })).status, 403);
 });
+
+test('booking screens serve meaningful headings and the staff page is protected', async () => {
+  const lab = await request('/labs/1', { cookie: first });
+  assert.equal(lab.status, 200);
+  assert.match(await lab.text(), /<h1>Lab A<\/h1>[\s\S]*id="day"[\s\S]*role="status"/);
+  const mine = await request('/bookings', { cookie: first });
+  assert.match(await mine.text(), /<h1>My bookings<\/h1>/);
+  assert.equal((await request('/staff', { cookie: first })).status, 403);
+  const management = await request('/staff', { cookie: staff });
+  assert.match(await management.text(), /Add a workstation/);
+  const script = await request('/assets/booking.js');
+  assert.match(script.headers.get('content-type'), /text\/javascript/);
+});

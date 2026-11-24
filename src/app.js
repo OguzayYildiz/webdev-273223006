@@ -8,13 +8,14 @@ const { labService } = require('./services/labs');
 const { HttpError, html, json, redirect, send, cookie, readBody } = require('./http');
 const view = require('./views');
 const { bookingData } = require('./data/bookings');
-const { bookingService, ServiceError } = require('./services/booking');
+const { bookingService, localTime, ServiceError } = require('./services/booking');
 const { handleBooking } = require('./booking-routes');
 
 function createApp(db, { publicBaseUrl, secure = false, now } = {}) {
   const auth = authService(identity(db));
   const labs = labService(labData(db));
   const booking = bookingService(bookingData(db), { now });
+  const script = readFileSync(join(__dirname, '../public/booking.js'));
   const css = readFileSync(join(__dirname, '../public/app.css'));
   const session = (token) => `sid=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${token ? 28800 : 0}${secure ? '; Secure' : ''}`;
 
@@ -32,6 +33,7 @@ function createApp(db, { publicBaseUrl, secure = false, now } = {}) {
         throw new HttpError(403, 'Submit this form from the Lab Booking site.');
       }
 
+      if (route === 'GET /assets/booking.js') return send(res, 200, script, 'text/javascript');
       if (route === 'GET /assets/app.css') return send(res, 200, css, 'text/css');
       if (route === 'GET /') return redirect(res, '/labs');
       if (route === 'GET /login') return html(res, 200, view.login());
@@ -55,6 +57,16 @@ function createApp(db, { publicBaseUrl, secure = false, now } = {}) {
         }
         const list = await labs.listLabs();
         return path.startsWith('/api/') ? json(res, 200, list) : html(res, 200, view.labs(list, user));
+      }
+      const match = route.match(/^GET \/labs\/(\d+)$/);
+      if (match || route === 'GET /bookings' || route === 'GET /staff') {
+        const user = await auth.current(token);
+        if (!user) return redirect(res, '/login', {}, 302);
+        const date = localTime(now ? now() : new Date()).date;
+        if (match) return html(res, 200, view.booking(await booking.lab(Number(match[1])), date, user));
+        if (route === 'GET /bookings') return html(res, 200, view.personal(user));
+        if (user.role !== 'staff') throw new HttpError(403, 'Staff access is required.');
+        return html(res, 200, view.staff(await labs.listLabs(), date, user));
       }
       if (await handleBooking({ req, res, url, auth, token, booking })) return;
       throw new HttpError(404, 'This page could not be found.');
