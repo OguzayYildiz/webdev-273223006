@@ -132,7 +132,33 @@ if (main) {
   }
 
   document.querySelector('#retry').addEventListener('click', () => load());
-  day?.addEventListener('change', () => load());
+  day?.addEventListener('change', () => {
+    const suggestion = document.querySelector('#suggestion');
+    if (suggestion) suggestion.textContent = '';
+    load();
+  });
+
+  document.querySelector('#suggest')?.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const submit = form.querySelector('button');
+    const feedback = document.querySelector('#suggestion');
+    const date = day.value;
+    submit.disabled = true;
+    feedback.textContent = 'Looking for a slot…';
+    try {
+      const result = await request(form.dataset.endpoint, 'POST', { date, preference: form.elements.preference.value });
+      if (day.value === date) {
+        feedback.textContent = result.suggestion
+          ? 'Suggested slot: ' + result.suggestion.workstation + ' at ' + time(result.suggestion.hour) + '. Select Book to reserve it.'
+          : result.message;
+      }
+    } catch {
+      if (day.value === date) feedback.textContent = 'Could not suggest a slot. Select a slot yourself.';
+    } finally {
+      submit.disabled = false;
+    }
+  });
 
   document.querySelector('#new-lab')?.addEventListener('submit', async (event) => {
     event.preventDefault();

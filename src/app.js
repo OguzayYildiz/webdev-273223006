@@ -10,11 +10,13 @@ const view = require('./views');
 const { bookingData } = require('./data/bookings');
 const { bookingService, localTime, ServiceError } = require('./services/booking');
 const { handleBooking } = require('./booking-routes');
+const { geminiClient, suggestionService } = require('./services/suggestion');
 
-function createApp(db, { publicBaseUrl, secure = false, now } = {}) {
+function createApp(db, { publicBaseUrl, secure = false, now, modelKey, modelName } = {}) {
   const auth = authService(identity(db));
   const labs = labService(labData(db));
   const booking = bookingService(bookingData(db), { now });
+  const suggest = suggestionService(booking, geminiClient({ key: modelKey, model: modelName }));
   const script = readFileSync(join(__dirname, '../public/booking.js'));
   const css = readFileSync(join(__dirname, '../public/app.css'));
   const session = (token) => `sid=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${token ? 28800 : 0}${secure ? '; Secure' : ''}`;
@@ -68,7 +70,7 @@ function createApp(db, { publicBaseUrl, secure = false, now } = {}) {
         if (user.role !== 'staff') throw new HttpError(403, 'Staff access is required.');
         return html(res, 200, view.staff(await labs.listLabs(), date, user));
       }
-      if (await handleBooking({ req, res, url, auth, token, booking })) return;
+      if (await handleBooking({ req, res, url, auth, token, booking, suggest })) return;
       throw new HttpError(404, 'This page could not be found.');
     } catch (error) {
       const status = error instanceof HttpError || error instanceof ServiceError ? error.status : 500;

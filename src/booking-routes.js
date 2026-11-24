@@ -1,6 +1,9 @@
 const { HttpError, json, send, readBody } = require('./http');
 
 const routes = [
+  ['POST', /^\/api\/labs\/(\d+)\/suggestion$/, async ({ suggest, user, match, req, res }) => {
+    json(res, 200, await suggest(user, Number(match[1]), await readBody(req)));
+  }],
   ['GET', /^\/api\/labs\/(\d+)\/slots$/, async ({ booking, user, match, url, res }) => {
     json(res, 200, await booking.slots(user, Number(match[1]), url.searchParams.get('date')));
   }],

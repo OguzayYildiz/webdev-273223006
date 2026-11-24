@@ -40,6 +40,11 @@ function booking(lab, date, user) {
   return page(lab.name, `<p><a href="/labs">All labs</a></p><h1>${escapeHtml(lab.name)}</h1>
 <p class="lede">${escapeHtml(lab.location)} · Europe/Sofia</p>
 <div class="date-field"><label for="day">Booking date</label><input id="day" type="date" min="${date}" value="${date}" required></div>
+<form id="suggest" class="panel stack" data-endpoint="/api/labs/${lab.id}/suggestion">
+<label for="preference">Ask for a slot suggestion</label>
+<input id="preference" name="preference" maxlength="200" placeholder="For example, before noon" aria-describedby="model-data" required>
+<p id="model-data">Your preference and candidate slots are sent to Gemini. Include scheduling details only.</p>
+<button>Suggest a slot</button><p id="suggestion" role="status"></p></form>
 ${statusRegion}`, user, 'lab', '/api/labs/' + lab.id + '/slots');
 }
 

@@ -7,7 +7,7 @@ async function main() {
   const db = await openDatabase({ url: process.env.DATABASE_URL, location: './.local/postgres' });
   try {
     await migrate(db);
-    const server = createApp(db, { publicBaseUrl: process.env.PUBLIC_BASE_URL, secure });
+    const server = createApp(db, { publicBaseUrl: process.env.PUBLIC_BASE_URL, secure, modelKey: process.env.GEMINI_API_KEY, modelName: process.env.MODEL_NAME });
     const port = Number(process.env.PORT ?? 3000);
     server.listen(port, '0.0.0.0', () => console.log('Lab Booking listening on port ' + port));
     for (const signal of ['SIGTERM', 'SIGINT']) {
