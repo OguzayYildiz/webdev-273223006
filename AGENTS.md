@@ -4,18 +4,20 @@ Read this file at the start of every session. Keep it short and correct; update 
 
 ## Project
 <!-- One or two sentences: what the app does and for whom. Link SPEC.md. -->
-See `SPEC.md` for goals, non-goals and acceptance criteria.
+Campus Workstations lets TU Sofia students book lab workstations and staff manage rooms. See `SPEC.md`.
 
 ## Commands
 <!-- How to install, run, test. Keep these exact and working. -->
-- Install: 
-- Run: 
-- Test: 
+- Install: npm ci
+- Run: npm start
+- Test: npm test
 - Coverage: 
-- MCP server: 
+- MCP server: npm run --silent mcp
 
 ## Conventions
 <!-- Folder layout, naming, where business rules live, how errors are returned to the client. -->
+
+Routes and views live in src. Business rules belong in src/services, database queries in src/data, and numbered schema changes in migrations.
 
 ## Layers
 <!-- Fill in the file or folder for each layer. -->

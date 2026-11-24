@@ -69,3 +69,24 @@ When an exercise is done, commit and push, so your work is on GitHub and CI has 
 ## Save your free quota
 
 Stop the codespace when you finish (**Code → Codespaces → … → Stop codespace**) and delete codespaces you no longer need.
+
+## Run Campus Workstations locally
+
+Oguzay Yildiz · 273223006
+
+Install Node.js 22 or newer, then run from the repository root:
+
+```sh
+npm ci
+npm run seed
+npm start
+```
+
+Open http://localhost:3000. The local seed account is `student@example.test`
+with password `lab-demo-student`. The seed command works only with the local
+development database. The application uses PostgreSQL in development
+(embedded) and can use a server via `DATABASE_URL`.
+
+Run `npm test` for the HTTP tests and `node checks/ex2.mjs` for the course
+specification check. See [CHECKLIST.md](CHECKLIST.md) for verified and pending
+submission items.

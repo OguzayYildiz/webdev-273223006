@@ -26,3 +26,10 @@ One entry per agent session, newest at the bottom. Be honest: what went wrong is
 - Checkpoints: The existing server passed 12/12 directly and 12/12 through the npm CLI. The original Gemini session and experiment are documented above and in the MCP README.
 - Went wrong: Windows could not spawn npm.cmd directly. A sandboxed wrapper run timed out on initialization. Running the npm CLI through Node with normal process permissions passed.
 - Changed by hand: No protocol code changed during this verification. The earlier entry records who wrote the original implementation.
+
+## 2026-11-24 · Exercise 2 first slice
+- Goal: Implement the first Lab Booking slice through sign-in, a protected directory and relational data.
+- Delegated: Codex drafted acceptance criteria and implemented the slice. The student approved the Lab Booking topic and implementation plan. The draft still needs the student's own review against the course criteria.
+- Checkpoints: A numbered migration ran in a disposable PostgreSQL database. HTTP tests passed 3/3, including direct signed-out requests and a real lab row deletion. The course structure check passed 32/32. The local seed completed.
+- Went wrong: The sandbox denied loopback connections. All three tests passed when allowed to connect to their local test server.
+- Changed by hand: No student keyboard or browser test was observed in this session.

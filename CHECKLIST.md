@@ -13,7 +13,7 @@ Oguzay Yildiz · 273223006
 ## Exercise 2 · Specification and first slice
 
 - [ ] Confirm the topic registration and student-authored acceptance criteria.
-- [ ] Verify sign-in and the database-backed list, run the course check and record the result.
+- [x] Verified sign-in, the protected directory and a real database row change in 3/3 HTTP tests. The course structure check passed 32/32.
 
 ## Exercise 3 · Full feature
 
