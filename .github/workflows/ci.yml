@@ -57,10 +57,10 @@ jobs:
           docker run -d --name course-db --network course-smoke \
             -e POSTGRES_PASSWORD=course-local-test postgres:17-alpine
           for attempt in $(seq 1 30); do
-            if docker exec course-db pg_isready -U postgres; then break; fi
+            if docker exec course-db pg_isready -h 127.0.0.1 -U postgres; then break; fi
             sleep 1
           done
-          docker exec course-db pg_isready -U postgres
+          docker exec course-db pg_isready -h 127.0.0.1 -U postgres
           export DATABASE_URL=postgresql://postgres:course-local-test@course-db:5432/postgres
           start_app() {
             docker run -d --name course-app --network course-smoke \
