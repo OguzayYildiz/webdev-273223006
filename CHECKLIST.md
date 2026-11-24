@@ -25,12 +25,13 @@ Oguzay Yildiz · 273223006
 - [ ] Verify a public deployment, provider sign-in and database persistence.
 - [x] Added Docker, deployment configuration, OAuth linking and readiness notes. The 33-test suite passed locally with 100% service lines and branches and 95.03% backend line coverage.
 - [x] Verified the four reservation states and no horizontal overflow on that screen at 380, 768 and 1280 px.
-- [ ] Record the Linux CI result and complete remaining UI evidence across all screens.
+- [x] Linux CI passed the app tests, coverage, MCP and course checks. It built the image and verified session and lab data survived replacement of the app container against a separate PostgreSQL container. [CI evidence](https://github.com/OguzayYildiz/webdev-273223006/actions/runs/45395234183)
+- [ ] Complete remaining UI evidence across all screens. The Exercise 4 course check passed 26/29 without a live URL.
 - [ ] Public URL, real OAuth and live rollback evidence are pending. The student deferred Render and Neon setup.
 
 ## Exercise 5 · Peer review
 
-- [x] Pinned the assigned peer's commit and drafted a source-evidenced review in REVIEW.md.
+- [x] Pinned the assigned peer's commit and drafted six findings in REVIEW.md. The Exercise 5 structural check reported 14/16.
 - [ ] Complete the independent review pass, student triage and reciprocal review.
 - [ ] Record any peer-requested fixes with failing-test and fix commits, then verify CI and redeployment.
 - [ ] Write student-authored DEFENSE.md and complete the course assistant walkthrough.

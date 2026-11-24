@@ -6,7 +6,7 @@ Oguzay Yildiz · 273223006 · 2026-11-24
 
 The public deployment is pending. `course.json` has no live URL yet. The Render dashboard requires an authenticated account, and the persistent PostgreSQL and OAuth credentials will be configured in the provider dashboards.
 
-How I checked: Local HTTP tests exercised `GET /health` and verified 200 with `{"status":"ok","db":"ok"}`. The Linux CI workflow builds the Dockerfile and checks the production process against a separate PostgreSQL container. Public HTTPS, the deployed commit and the CI-gated rollout remain to be checked after deployment.
+How I checked: Local HTTP tests exercised `GET /health` and verified 200 with `{"status":"ok","db":"ok"}`. Linux CI built the Dockerfile and ran the production image against a separate PostgreSQL container. A staff account created a lab over HTTP. The same session could still see that lab after the application container was removed and recreated. [CI evidence](https://github.com/OguzayYildiz/webdev-273223006/actions/runs/45395234183) Public HTTPS, the deployed commit and the CI-gated rollout remain to be checked after deployment.
 
 ## 2. Environment variables
 

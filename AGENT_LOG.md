@@ -57,3 +57,5 @@ One entry per agent session, newest at the bottom. Be honest: what went wrong is
 - Checkpoints: Recorded six rows with links to the reviewed commit. The peer and project production lockfile audits both reported zero advisories.
 - Pending: Independent second agent pass, the student's manual triage, Ahmet's reciprocal review, and any test-first fixes and deployment verification it requires.
 - Changed by hand: The student supplied the assigned peer's repository link. The defence note remains the student's own work.
+
+The GitHub Actions run for `335431a` finished green across test, coverage, spec and MCP. The first production smoke run had seen the temporary PostgreSQL setup socket, which closed before the regular server came up. The subsequent run waited for TCP and confirmed database and session persistence across application container replacement. The overall course checker passed 3/6, with the remaining failures in live/UI verification, reciprocal-review fixes and the student defence notes.
